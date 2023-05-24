@@ -1,14 +1,21 @@
 import { calculateWinner } from "./calculateWinnter";
+import "./Board.css";
 
-function Square({ value, onSquareClick }) {
+function Square({ value, onSquareClick, isHighlight }) {
   return (
-    <button className="square" onClick={onSquareClick}>
+    <button
+      className="square"
+      style={{
+        background: isHighlight ? "lightgreen" : "",
+      }}
+      onClick={onSquareClick}
+    >
       {value}
     </button>
   );
 }
 
-const generateBoard = (rows, cols, squares, handleClick) =>
+const generateBoard = ({ rows, cols, squares, handleClick, winnerLine }) =>
   Array.from({ length: rows }, (_, rowIdx) => (
     <div key={rowIdx} className="board-row">
       {Array.from({ length: cols }, (_, colIdx) => {
@@ -19,6 +26,9 @@ const generateBoard = (rows, cols, squares, handleClick) =>
             key={colIdx}
             value={squares[currentSquare]}
             onSquareClick={() => handleClick(currentSquare)}
+            isHighlight={
+              (winnerLine && winnerLine.includes(currentSquare)) ?? false
+            }
           />
         );
       })}
@@ -26,8 +36,10 @@ const generateBoard = (rows, cols, squares, handleClick) =>
   ));
 
 export const Board = ({ xIsNext, squares, onPlay }) => {
+  const { winner, winnerLine } = calculateWinner(squares);
+
   function handleClick(i) {
-    if (calculateWinner(squares) || squares[i]) {
+    if (winner || squares[i]) {
       return;
     }
     const nextSquares = squares.slice();
@@ -39,18 +51,28 @@ export const Board = ({ xIsNext, squares, onPlay }) => {
     onPlay(nextSquares);
   }
 
-  const winner = calculateWinner(squares);
-  let status;
-  if (winner) {
-    status = "Winner: " + winner;
-  } else {
-    status = "Next player: " + (xIsNext ? "X" : "O");
-  }
+  const renderStatus = () => {
+    let status;
+    if (winner) {
+      status = "Winner: " + winner;
+    } else {
+      status = "Next player: " + (xIsNext ? "X" : "O");
+    }
+
+    return status;
+  };
 
   return (
     <>
-      <div className="status">{status}</div>
-      {generateBoard(3, 3, squares, handleClick)}
+      <div className="status">{renderStatus()}</div>
+
+      {generateBoard({
+        rows: 3,
+        cols: 3,
+        squares,
+        handleClick,
+        winnerLine,
+      })}
     </>
   );
 };

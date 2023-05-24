@@ -16,19 +16,24 @@ export default function Game() {
     setCurrentMove(nextHistory.length - 1);
   }
 
-  const moves = history.map((_, move) => {
-    return (
-      <li key={move}>
-        {currentMove === move ? (
-          `You are at move #${move}`
-        ) : (
-          <button onClick={() => setCurrentMove(move)}>
-            {move === 0 ? "Go to game start" : `Go to move #${move}`}
-          </button>
-        )}
-      </li>
-    );
-  });
+  const moves = history
+    .map((_, i) => i)
+    .sort((a, b) => (sorting === "asc" ? a - b : b - a))
+    .map((move) => {
+      return (
+        <div key={move}>
+          <span>{`${move + 1}. `}</span>
+
+          {currentMove === move ? (
+            `You are at move #${move}`
+          ) : (
+            <button onClick={() => setCurrentMove(move)}>
+              {move === 0 ? "Go to game start" : `Go to move #${move}`}
+            </button>
+          )}
+        </div>
+      );
+    });
 
   return (
     <div className="game">
@@ -45,7 +50,15 @@ export default function Game() {
           make moves {sorting === "asc" ? "descending" : "ascending"}
         </button>
 
-        <ol>{sorting === "asc" ? moves : moves.reverse()}</ol>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "flex-start",
+          }}
+        >
+          {moves}
+        </div>
       </div>
     </div>
   );
