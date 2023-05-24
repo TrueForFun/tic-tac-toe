@@ -15,5 +15,6 @@ export const calculateWinner = (squares) => {
       return { winner: squares[a], winnerLine: lines[i] };
     }
   }
+
   return { winner: null, winnerLine: null };
 };

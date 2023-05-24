@@ -9,6 +9,9 @@ export default function Game() {
 
   const xIsNext = currentMove % 2 === 0;
   const currentSquares = history[currentMove];
+  const isAllMovesMade = history
+    .map((moves) => moves.every((move) => typeof move === "string"))
+    .some((item) => item === true);
 
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, currentMove + 1), nextSquares];
@@ -38,7 +41,12 @@ export default function Game() {
   return (
     <div className="game">
       <div className="game-board">
-        <Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
+        <Board
+          xIsNext={xIsNext}
+          squares={currentSquares}
+          onPlay={handlePlay}
+          isAllMovesMade={isAllMovesMade}
+        />
       </div>
 
       <div className="game-info">

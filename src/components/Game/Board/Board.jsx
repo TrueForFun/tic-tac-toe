@@ -26,16 +26,14 @@ const generateBoard = ({ rows, cols, squares, handleClick, winnerLine }) =>
             key={colIdx}
             value={squares[currentSquare]}
             onSquareClick={() => handleClick(currentSquare)}
-            isHighlight={
-              (winnerLine && winnerLine.includes(currentSquare)) ?? false
-            }
+            isHighlight={winnerLine && winnerLine.includes(currentSquare)}
           />
         );
       })}
     </div>
   ));
 
-export const Board = ({ xIsNext, squares, onPlay }) => {
+export const Board = ({ xIsNext, squares, onPlay, isAllMovesMade }) => {
   const { winner, winnerLine } = calculateWinner(squares);
 
   function handleClick(i) {
@@ -53,7 +51,9 @@ export const Board = ({ xIsNext, squares, onPlay }) => {
 
   const renderStatus = () => {
     let status;
-    if (winner) {
+    if (!winner && isAllMovesMade) {
+      status = `A draw`;
+    } else if (winner) {
       status = "Winner: " + winner;
     } else {
       status = "Next player: " + (xIsNext ? "X" : "O");
