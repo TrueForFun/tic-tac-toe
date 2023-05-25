@@ -1,14 +1,16 @@
 import { calculateWinner } from "./calculateWinnter";
 import "./Board.css";
 
-function Square({ value, onSquareClick, isHighlight }) {
+function Square({ value, onSquareClick, currentSquare, isHighlight, coords }) {
+  const [row, col] = coords;
   return (
     <button
       className="square"
       style={{
         background: isHighlight ? "lightgreen" : "",
       }}
-      onClick={onSquareClick}
+      onClick={(e) => onSquareClick(e, currentSquare)}
+      data-coords={`${row} ${col}`}
     >
       {value}
     </button>
@@ -24,9 +26,11 @@ const generateBoard = ({ rows, cols, squares, handleClick, winnerLine }) =>
         return (
           <Square
             key={colIdx}
-            value={squares[currentSquare]}
-            onSquareClick={() => handleClick(currentSquare)}
+            value={squares[currentSquare]?.player ?? null}
+            currentSquare={currentSquare}
+            onSquareClick={handleClick}
             isHighlight={winnerLine && winnerLine.includes(currentSquare)}
+            coords={[rowIdx, colIdx]}
           />
         );
       })}
@@ -36,17 +40,23 @@ const generateBoard = ({ rows, cols, squares, handleClick, winnerLine }) =>
 export const Board = ({ xIsNext, squares, onPlay, isAllMovesMade }) => {
   const { winner, winnerLine } = calculateWinner(squares);
 
-  function handleClick(i) {
-    if (winner || squares[i]) {
+  function handleClick(event, currentSquareNumber) {
+    const coords = event.target.dataset.coords;
+
+    if (winner || squares[currentSquareNumber]) {
       return;
     }
     const nextSquares = squares.slice();
-    if (xIsNext) {
-      nextSquares[i] = "X";
-    } else {
-      nextSquares[i] = "O";
-    }
-    onPlay(nextSquares);
+    nextSquares[currentSquareNumber] = {
+      player: xIsNext ? "X" : "O",
+      coords,
+      currentSquareNumber,
+    };
+
+    onPlay({
+      currentSquareNumber,
+      squares: nextSquares,
+    });
   }
 
   const renderStatus = () => {
